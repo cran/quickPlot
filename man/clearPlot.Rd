@@ -44,8 +44,8 @@ manually.
 \examples{
 library(sp)
 library(raster)
+requireNamespace("rgdal") # required for raster loading
 library(RColorBrewer)
-library(rgdal)
 
 files <- dir(system.file("maps", package = "quickPlot"), full.names = TRUE, pattern = "tif")
 maps <- lapply(files, raster)
