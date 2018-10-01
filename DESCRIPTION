@@ -7,13 +7,13 @@ Description: A high-level plotting system, built using 'grid' graphics, that is
     are updated independently of one another.
 URL: http://quickplot.predictiveecology.org,
         https://github.com/PredictiveEcology/quickPlot
-Version: 0.1.4
-Date: 2018-06-22
+Version: 0.1.5
+Date: 2018-10-01
 Authors@R: c(
     person("Eliot J B", "McIntire", email = "eliot.mcintire@canada.ca",
-    role = c("aut", "cre")),
+    role = c("aut", "cre"), comment=c(ORCID = "https://orcid.org/0000-0002-6914-8316")),
     person("Alex M", "Chubaty", email = "alex.chubaty@gmail.com",
-    role = c("aut")),
+    role = c("aut"), comment = c(ORCID = "https://orcid.org/0000-0001-7146-8135")),
     person("Her Majesty the Queen in Right of Canada, as represented by the Minister of Natural Resources Canada",
     role = "cph")
     )
@@ -28,16 +28,16 @@ License: GPL-3
 VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/quickPlot/issues
 ByteCompile: yes
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0.9000
 Collate: 'environment.R' 'plotting-classes.R' 'plotting-colours.R'
         'plotting-helpers.R' 'plotting-other.R' 'plotting.R'
         'quickPlot-classes.R' 'quickPlot-package.R' 'zzz.R'
 NeedsCompilation: no
-Packaged: 2018-06-25 16:00:39 UTC; achubaty
-Author: Eliot J B McIntire [aut, cre],
-  Alex M Chubaty [aut],
+Packaged: 2018-10-01 20:19:52 UTC; emcintir
+Author: Eliot J B McIntire [aut, cre] (<https://orcid.org/0000-0002-6914-8316>),
+  Alex M Chubaty [aut] (<https://orcid.org/0000-0001-7146-8135>),
   Her Majesty the Queen in Right of Canada, as represented by the
     Minister of Natural Resources Canada [cph]
 Maintainer: Eliot J B McIntire <eliot.mcintire@canada.ca>
 Repository: CRAN
-Date/Publication: 2018-06-26 04:38:29 UTC
+Date/Publication: 2018-10-01 21:00:03 UTC

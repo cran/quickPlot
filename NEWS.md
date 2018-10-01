@@ -1,5 +1,10 @@
 Known issues: https://github.com/PredictiveEcology/quickPlot/issues
 
+
+version 0.1.5
+=============
+* new function `isRstudioServer`
+
 version 0.1.4
 =============
 * much faster for `SpatialPolygons`
