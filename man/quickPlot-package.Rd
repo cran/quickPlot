@@ -18,18 +18,18 @@ The suggested package \pkg{fastshp} can be installed with
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://quickplot.predictiveecology.org}
+  \item \url{https://quickplot.predictiveecology.org}
   \item \url{https://github.com/PredictiveEcology/quickPlot}
   \item Report bugs at \url{https://github.com/PredictiveEcology/quickPlot/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Eliot J B McIntire \email{eliot.mcintire@canada.ca} (https://orcid.org/0000-0002-6914-8316)
+\strong{Maintainer}: Eliot J B McIntire \email{eliot.mcintire@canada.ca} (\href{https://orcid.org/0000-0002-6914-8316}{ORCID})
 
 Authors:
 \itemize{
-  \item Alex M Chubaty \email{alex.chubaty@gmail.com} (https://orcid.org/0000-0001-7146-8135)
+  \item Alex M Chubaty \email{achubaty@for-cast.ca} (\href{https://orcid.org/0000-0001-7146-8135}{ORCID})
 }
 
 Other contributors:
