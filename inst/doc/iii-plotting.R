@@ -4,53 +4,51 @@ quickPlot::clearPlot()
 ## ----load_files, eval=TRUE, echo=TRUE, message=FALSE, fig.height=2------------
 #  Make list of maps from package database to load, and what functions to use to load them
 library(data.table)
-library(igraph)
-library(raster)
+library(terra)
 library(quickPlot)
 
 # omit forestAge and percentPine maps for simplicity
-files <- system.file("maps", package = "quickPlot") %>%
-  dir(., full.names = TRUE, pattern = "tif")
+files <- system.file("maps", package = "quickPlot") |>
+  dir(full.names = TRUE, pattern = "tif")
 filelist <- data.frame(file = files[-c(2, 5) ], stringsAsFactors = FALSE)
 print(filelist)
 
 # Load files to memory (using rasterToMemory), assign to a simList we call maps 
-maps <- lapply(filelist$file, function(x) raster(x))
+maps <- lapply(filelist$file, function(x) rast(x))
 names(maps) <- sapply(basename(filelist$file), function(x) {
   strsplit(x, split = "\\.")[[1]][1]
 })
 
 # put into a single stack object in the simulation environment for ease of use below
-landscape <- stack(maps$DEM, maps$forestCover, maps$habitatQuality)
+landscape <- c(maps$DEM, maps$forestCover, maps$habitatQuality)
 
 ## ----first_plot, eval=TRUE, echo=TRUE, fig.height=2---------------------------
 Plot(landscape, new = TRUE)
 # make a SpatialPoints object
-caribou <- SpatialPoints(coords = cbind(x = stats::runif(1e2, -50, 50),
-                                        y = stats::runif(1e2, -50, 50)))
+caribou <- terra::vect(cbind(x = stats::runif(1e2, -50, 50),
+                             y = stats::runif(1e2, -50, 50)))
 Plot(caribou)
 Plot(caribou, addTo = "landscape$habitatQuality")
 
-# from SpatialPolygons help file
-sr1 <- Polygon(cbind(c(2, 4, 4, 1, 2), c(2, 3, 5, 4, 2)) * 20 - 50)
-sr2 <- Polygon(cbind(c(5, 4, 2, 5), c(2, 3, 2, 2)) * 20 - 50)
+# from ?vect help file
+x1 <- rbind(c(-18,-2), c(-14,5.5), c(1, 0), c(-14,-6))
+x2 <- rbind(c(-1,0), c(14,6), c(16,0), c(14,-5.5))
+x3 <- rbind(c(-12.5,0), c(0,6), c(4,0.5), c(1.5,-4.5))
+hole <- rbind(c(8,0), c(10.5,1.3), c(12,0.2), c(10.5,-1.3))
+z <- rbind(cbind(object=1, part=1, x1, hole=0), cbind(object=2, part=1, x3, hole=0),
+			cbind(object=3, part=1, x2, hole=0), cbind(object=3, part=1, hole, hole=1))
+colnames(z)[3:4] <- c('x', 'y')
+spP <- terra::vect(z, "polygons")
 
-srs1 <- Polygons(list(sr1), "s1")
-srs2 <- Polygons(list(sr2), "s2")
-spP <- SpatialPolygons(list(srs1, srs2), 1:2)
 Plot(spP)
 Plot(spP, addTo = "landscape$habitatQuality", gp = gpar(lwd = 2))
 
-# from SpatialLines help file
-l1 <- cbind(c(10, 2, 30), c(30, 2, 2))
-l1a <- cbind(l1[, 1] + .05, l1[, 2] + .05)
-l2 <- cbind(c(1, 20, 3), c(10, 1.5, 1))
-sl1 <- Line(l1)
-sl1a <- Line(l1a)
-sl2 <- Line(l2)
-s1 <- Lines(list(sl1, sl1a), ID = "a")
-s2 <- Lines(list(sl2), ID = "b")
-sl <- SpatialLines(list(s1, s2))
+
+
+# from ?vect help file
+z[z[, "hole"]==1, "object"] <- 4
+sl <- vect(z[,1:4], "lines")
+
 Plot(sl, gp = gpar(col = c("red", "blue"), lwd = 2), addTo = "landscape$DEM")
 
 ## ----mixing_layer_types, eval=TRUE, echo=TRUE, fig.height=5-------------------
@@ -59,37 +57,44 @@ Plot(landscape, caribou, maps$DEM, spP, axes = TRUE,
      gp = gpar(cex = 0.5), visualSqueeze = 0.65)
 
 ## ----ggplot, eval=TRUE, echo=TRUE, cache=FALSE, fig.height=2------------------
-library(ggplot2)
-
-ggObj <- qplot(stats::rnorm(1e3), binwidth = 0.1)
-clearPlot()
-Plot(caribou, axes = "L", new = TRUE) 
-Plot(ggObj) 
+if (requireNamespace("ggplot2")) {
+  ggObj <- data.frame(x = stats::rnorm(1e3)) |> ggplot2::ggplot(ggplot2::aes(x = x)) +
+    ggplot2::geom_histogram()
+  clearPlot()
+  Plot(caribou, axes = "L", new = TRUE) 
+  Plot(ggObj) 
+}
 
 ## ----base-objects, eval=FALSE, echo=TRUE, cache=FALSE, fig.height=2-----------
 #  baseObj <- rnorm(1e3)
 #  baseObj2 <- baseObj * 1.2 + rnorm(1e3)
 #  clearPlot()
-#  Plot(baseObj, axes = "L", ylab = "Something meaningful")
+#  # Plot(baseObj, axes = "L", ylab = "Something meaningful")
 #  Plot(baseObj, baseObj2, addTo = "scatterplot", axes = TRUE)
 #  newPoints <- rnorm(10)
 #  newPoints2 <- newPoints * 1.2 + rnorm(10)
 #  Plot(newPoints, newPoints2, addTo = "scatterplot", col = "red")
 
 ## ----set_colours, eval=TRUE, echo=TRUE, fig.height=2--------------------------
-library(RColorBrewer)
-
-# can change colour palette
-clearPlot()
-Plot(landscape) # original
-
-mapColours <- list(
-  DEM = topo.colors(50),
-  forestCover = colorRampPalette(c("blue", "orange", "purple", "red"))(50),
-  habitatQuality = brewer.pal(9, "Spectral")
-)
-setColors(landscape, n = 50) <- mapColours
-Plot(landscape, new = TRUE) # oh, how pretty!
+  
+  # can change colour palette
+  clearPlot()
+  Plot(landscape) # original
+  
+  # can use RColorBrewer if installed
+  habQualCols <- if (requireNamespace("RColorBrewer")) {
+    RColorBrewer::brewer.pal(9, "Spectral")
+  } else {
+    colorRampPalette(c("blue", "purple"))(9)
+  }
+  
+  mapColours <- list(
+    DEM = topo.colors(50),
+    forestCover = colorRampPalette(c("blue", "orange", "purple", "red"))(50),
+    habitatQuality = habQualCols
+  )
+  setColors(landscape, n = 50) <- mapColours
+  Plot(landscape, new = TRUE) # oh, how pretty!
 
 ## ----gp_gpAxis_gpText, eval=TRUE, echo=TRUE, fig.height=2---------------------
 clearPlot()
@@ -110,7 +115,7 @@ clearPlot()
 Plot(maps$DEM, legendRange = c(0, 500), new = TRUE)
 
 ## ----zoomExtent, eval=TRUE, echo=TRUE, fig.height=2---------------------------
-Plot(maps$DEM, zoomExtent = extent(c(-1, 10, -1, 20)), new = TRUE)
+Plot(maps$DEM, zoomExtent = terra::ext(c(-1, 10, -1, 20)), new = TRUE)
 
 ## ----arrows, eval=TRUE, echo=TRUE, fig.height=2-------------------------------
 clearPlot()
